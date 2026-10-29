@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,6 +18,7 @@ namespace FileExplorer_240075
         {
             InitializeComponent();
             AddNodes();
+            ShowThisPC();
         }
 
         public void AddNodes()
@@ -36,6 +39,87 @@ namespace FileExplorer_240075
             quickAcessNodes.Expand();
 
             trwFile.Nodes.Add("💻 This PC");
+        }
+
+        public void ShowThisPC()
+        {
+            panelMain.Controls.Clear();
+
+            panelMain.Controls.Add(lblDeviceAndDrivers);
+            panelMain.Controls.Add(panelCardDriveC);
+
+            txtDirectory.Text = "💻  This PC  >";
+        }
+
+        public void OpenFolder(string caminho, string nomeTitulo)
+        {
+            panelMain.Controls.Clear();
+            txtDirectory.Text = $"💻  This PC  > {nomeTitulo}";
+
+            Label lblTitulo = new Label
+            {
+                Text = nomeTitulo,
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                Location = new Point(20, 20),
+                AutoSize = true
+            };
+            panelMain.Controls.Add(lblTitulo);
+
+            try
+            {
+                string[] subpastas = Directory.GetDirectories(caminho);
+                int posTop = 60;
+                int posLeft = 20;
+
+
+                foreach (string s in subpastas)
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(s);
+                    if ((dirInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                        continue;
+
+                    Panel cardPasta = new Panel
+                    {
+                        Location = new Point(posLeft, posTop),
+                        Size = new Size(110, 90),
+                        BackColor = Color.White,
+                        Cursor = Cursors.Hand,
+                        BorderStyle = BorderStyle.FixedSingle
+                    };
+
+                    Label lblIcon = new Label
+                    {
+                        Text = "📁",
+                        Font = new Font("Segoe UI Emoji", 24F),
+                        Location = new Point(32, 10),
+                        AutoSize = true
+                    };
+
+                    Label lblNome = new Label
+                    {
+                        Text = dirInfo.Name,
+                        Font = new Font("Segoe UI", 8.5F),
+                        Location = new Point(5, 58),
+                        Size = new Size(100, 28),
+                        TextAlign = ContentAlignment.MiddleCenter
+                    };
+
+                    cardPasta.Controls.Add(lblIcon);
+                    cardPasta.Controls.Add(lblNome);
+                    panelMain.Controls.Add(cardPasta);
+
+                    posLeft += 130;
+                    if (posLeft > panelMain.Width - 140)
+                    {
+                        posLeft = 20;
+                        posTop += 105;
+                    }
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Acesso negado a esta pasta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void txtSearch_Enter(object sender, EventArgs e)
