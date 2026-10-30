@@ -19,7 +19,7 @@ namespace FileExplorer_240075
             AddNodes();
             ShowThisPC();
         }
-
+        string texto = "💻 This PC";
         public void AddNodes()
         {
             trwFile.Nodes.Clear();
@@ -69,7 +69,6 @@ namespace FileExplorer_240075
                 string[] subpastas = Directory.GetDirectories(caminho);
                 int posTop = 60;
                 int posLeft = 20;
-
 
                 foreach (string s in subpastas)
                 {
@@ -149,7 +148,33 @@ namespace FileExplorer_240075
             menuView.Show(btnView, new Point(0, btnView.Height));
 
         }
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+            string currentDirectory = txtDirectory.Text;
+            if(string.IsNullOrEmpty(currentDirectory))
+            {
+                MessageBox.Show("Precisa de ter algum diretório selecionado para poder criar uma nova pasta.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            try
+            {
+                string newFolderPath = Path.Combine(currentDirectory, "Nova Pasta");
 
+                int counter = 1;
+                string originalPath = newFolderPath;
+                while(Directory.Exists(newFolderPath))
+                {
+                    newFolderPath = $"{originalPath} ({counter})";
+                    counter++;
+                }
+                Directory.CreateDirectory(newFolderPath);
+                MessageBox.Show("Pasta Criada", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Ocorreu um erro ao criar a pasta: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private void trwFile_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Text.Contains("This PC"))

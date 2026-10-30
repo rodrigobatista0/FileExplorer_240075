@@ -41,6 +41,8 @@
             this.panelLeft = new System.Windows.Forms.Panel();
             this.trwFile = new System.Windows.Forms.TreeView();
             this.panelToolBar = new System.Windows.Forms.Panel();
+            this.btnDetails = new System.Windows.Forms.Button();
+            this.btnPoint = new System.Windows.Forms.Button();
             this.btnView = new System.Windows.Forms.Button();
             this.btnSort = new System.Windows.Forms.Button();
             this.btnTrash = new System.Windows.Forms.Button();
@@ -62,15 +64,13 @@
             this.detailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnPoint = new System.Windows.Forms.Button();
-            this.btnDetails = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
-            this.lblDeviceAndDrivers = new System.Windows.Forms.Label();
             this.panelCardDriveC = new System.Windows.Forms.Panel();
-            this.lblIconDisk = new System.Windows.Forms.Label();
-            this.labelPC1 = new System.Windows.Forms.Label();
-            this.pbPC1 = new System.Windows.Forms.ProgressBar();
             this.lblSpacePC1 = new System.Windows.Forms.Label();
+            this.pbPC1 = new System.Windows.Forms.ProgressBar();
+            this.labelPC1 = new System.Windows.Forms.Label();
+            this.lblIconDisk = new System.Windows.Forms.Label();
+            this.lblDeviceAndDrivers = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelToolBar.SuspendLayout();
@@ -208,6 +208,7 @@
             this.trwFile.ShowPlusMinus = false;
             this.trwFile.Size = new System.Drawing.Size(246, 493);
             this.trwFile.TabIndex = 0;
+            this.trwFile.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trwFile_AfterSelect);
             // 
             // panelToolBar
             // 
@@ -228,6 +229,29 @@
             this.panelToolBar.Name = "panelToolBar";
             this.panelToolBar.Size = new System.Drawing.Size(799, 49);
             this.panelToolBar.TabIndex = 3;
+            // 
+            // btnDetails
+            // 
+            this.btnDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDetails.FlatAppearance.BorderSize = 0;
+            this.btnDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDetails.Location = new System.Drawing.Point(721, 6);
+            this.btnDetails.Name = "btnDetails";
+            this.btnDetails.Size = new System.Drawing.Size(75, 40);
+            this.btnDetails.TabIndex = 4;
+            this.btnDetails.Text = "Details";
+            this.btnDetails.UseVisualStyleBackColor = true;
+            // 
+            // btnPoint
+            // 
+            this.btnPoint.FlatAppearance.BorderSize = 0;
+            this.btnPoint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPoint.Location = new System.Drawing.Point(527, 6);
+            this.btnPoint.Name = "btnPoint";
+            this.btnPoint.Size = new System.Drawing.Size(75, 40);
+            this.btnPoint.TabIndex = 9;
+            this.btnPoint.Text = "•••";
+            this.btnPoint.UseVisualStyleBackColor = true;
             // 
             // btnView
             // 
@@ -325,6 +349,7 @@
             this.btnNew.TabIndex = 4;
             this.btnNew.Text = "➕ New";
             this.btnNew.UseVisualStyleBackColor = false;
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
             // menuSort
             // 
@@ -419,29 +444,6 @@
             this.contentToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.contentToolStripMenuItem.Text = "Content";
             // 
-            // btnPoint
-            // 
-            this.btnPoint.FlatAppearance.BorderSize = 0;
-            this.btnPoint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPoint.Location = new System.Drawing.Point(527, 6);
-            this.btnPoint.Name = "btnPoint";
-            this.btnPoint.Size = new System.Drawing.Size(75, 40);
-            this.btnPoint.TabIndex = 9;
-            this.btnPoint.Text = "•••";
-            this.btnPoint.UseVisualStyleBackColor = true;
-            // 
-            // btnDetails
-            // 
-            this.btnDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDetails.FlatAppearance.BorderSize = 0;
-            this.btnDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDetails.Location = new System.Drawing.Point(721, 6);
-            this.btnDetails.Name = "btnDetails";
-            this.btnDetails.Size = new System.Drawing.Size(75, 40);
-            this.btnDetails.TabIndex = 4;
-            this.btnDetails.Text = "Details";
-            this.btnDetails.UseVisualStyleBackColor = true;
-            // 
             // panelMain
             // 
             this.panelMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -456,17 +458,6 @@
             this.panelMain.Size = new System.Drawing.Size(544, 457);
             this.panelMain.TabIndex = 4;
             // 
-            // lblDeviceAndDrivers
-            // 
-            this.lblDeviceAndDrivers.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.lblDeviceAndDrivers.AutoSize = true;
-            this.lblDeviceAndDrivers.ForeColor = System.Drawing.Color.Blue;
-            this.lblDeviceAndDrivers.Location = new System.Drawing.Point(13, 3);
-            this.lblDeviceAndDrivers.Name = "lblDeviceAndDrivers";
-            this.lblDeviceAndDrivers.Size = new System.Drawing.Size(149, 20);
-            this.lblDeviceAndDrivers.TabIndex = 0;
-            this.lblDeviceAndDrivers.Text = "˅  Devices and drives";
-            // 
             // panelCardDriveC
             // 
             this.panelCardDriveC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -479,33 +470,6 @@
             this.panelCardDriveC.Size = new System.Drawing.Size(280, 75);
             this.panelCardDriveC.TabIndex = 1;
             // 
-            // lblIconDisk
-            // 
-            this.lblIconDisk.AutoSize = true;
-            this.lblIconDisk.Font = new System.Drawing.Font("Segoe UI Emoji", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIconDisk.Location = new System.Drawing.Point(9, 12);
-            this.lblIconDisk.Name = "lblIconDisk";
-            this.lblIconDisk.Size = new System.Drawing.Size(67, 46);
-            this.lblIconDisk.TabIndex = 0;
-            this.lblIconDisk.Text = "🖥️";
-            // 
-            // labelPC1
-            // 
-            this.labelPC1.AutoSize = true;
-            this.labelPC1.Location = new System.Drawing.Point(71, 12);
-            this.labelPC1.Name = "labelPC1";
-            this.labelPC1.Size = new System.Drawing.Size(129, 20);
-            this.labelPC1.TabIndex = 1;
-            this.labelPC1.Text = "Windows-SSD (C:)";
-            // 
-            // pbPC1
-            // 
-            this.pbPC1.Location = new System.Drawing.Point(75, 35);
-            this.pbPC1.Name = "pbPC1";
-            this.pbPC1.Size = new System.Drawing.Size(200, 10);
-            this.pbPC1.TabIndex = 2;
-            this.pbPC1.Value = 55;
-            // 
             // lblSpacePC1
             // 
             this.lblSpacePC1.AutoSize = true;
@@ -516,6 +480,44 @@
             this.lblSpacePC1.Size = new System.Drawing.Size(137, 17);
             this.lblSpacePC1.TabIndex = 3;
             this.lblSpacePC1.Text = "222 GB free of 474 GB";
+            // 
+            // pbPC1
+            // 
+            this.pbPC1.Location = new System.Drawing.Point(75, 35);
+            this.pbPC1.Name = "pbPC1";
+            this.pbPC1.Size = new System.Drawing.Size(200, 10);
+            this.pbPC1.TabIndex = 2;
+            this.pbPC1.Value = 55;
+            // 
+            // labelPC1
+            // 
+            this.labelPC1.AutoSize = true;
+            this.labelPC1.Location = new System.Drawing.Point(71, 12);
+            this.labelPC1.Name = "labelPC1";
+            this.labelPC1.Size = new System.Drawing.Size(129, 20);
+            this.labelPC1.TabIndex = 1;
+            this.labelPC1.Text = "Windows-SSD (C:)";
+            // 
+            // lblIconDisk
+            // 
+            this.lblIconDisk.AutoSize = true;
+            this.lblIconDisk.Font = new System.Drawing.Font("Segoe UI Emoji", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIconDisk.Location = new System.Drawing.Point(9, 12);
+            this.lblIconDisk.Name = "lblIconDisk";
+            this.lblIconDisk.Size = new System.Drawing.Size(64, 44);
+            this.lblIconDisk.TabIndex = 0;
+            this.lblIconDisk.Text = "🖥️";
+            // 
+            // lblDeviceAndDrivers
+            // 
+            this.lblDeviceAndDrivers.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.lblDeviceAndDrivers.AutoSize = true;
+            this.lblDeviceAndDrivers.ForeColor = System.Drawing.Color.Blue;
+            this.lblDeviceAndDrivers.Location = new System.Drawing.Point(13, 3);
+            this.lblDeviceAndDrivers.Name = "lblDeviceAndDrivers";
+            this.lblDeviceAndDrivers.Size = new System.Drawing.Size(149, 20);
+            this.lblDeviceAndDrivers.TabIndex = 0;
+            this.lblDeviceAndDrivers.Text = "˅  Devices and drives";
             // 
             // Form1
             // 
