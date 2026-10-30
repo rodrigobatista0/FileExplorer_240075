@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace FileExplorer_240075
 {
     public partial class Form1 : Form
@@ -23,7 +22,7 @@ namespace FileExplorer_240075
 
         public void AddNodes()
         {
-        trwFile.Nodes.Clear();
+            trwFile.Nodes.Clear();
 
             trwFile.Nodes.Add("🏠 Home");
             trwFile.Nodes.Add("🖼️ Gallery");
@@ -114,7 +113,7 @@ namespace FileExplorer_240075
                         posLeft = 20;
                         posTop += 105;
                     }
-                });
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -124,7 +123,7 @@ namespace FileExplorer_240075
 
         private void txtSearch_Enter(object sender, EventArgs e)
         {
-            if(txtSearch.Text == "Search This PC")
+            if (txtSearch.Text == "Search This PC")
             {
                 txtSearch.Text = "";
                 txtSearch.ForeColor = Color.Black;
@@ -133,7 +132,7 @@ namespace FileExplorer_240075
 
         private void txtSearch_Leave(object sender, EventArgs e)
         {
-            if(string.IsNullOrWhiteSpace(txtSearch.Text))
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
             {
                 txtSearch.Text = "Search This PC";
                 txtSearch.ForeColor = Color.Gray;
@@ -151,6 +150,37 @@ namespace FileExplorer_240075
 
         }
 
-
+        private void trwFile_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Text.Contains("This PC"))
+            {
+                ShowThisPC();
+            }
+            else if (e.Node.Text.Contains("Documents"))
+            {
+                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents");
+            }
+            else if (e.Node.Text.Contains("Downloads"))
+            {
+                OpenFolder(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"), "Downloads");
+            }
+            else if (e.Node.Text.Contains("Desktop"))
+            {
+                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Desktop");
+            }
+            else if (e.Node.Text.Contains("Pictures"))
+            {
+                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Pictures");
+            }
+            else if (e.Node.Text.Contains("Music"))
+            {
+                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Music");
+            }
+            else if (e.Node.Text.Contains("Videos"))
+            {
+                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Videos");
+            }
+        }
     }
 }
+
