@@ -13,13 +13,15 @@ namespace FileExplorer_240075
 {
     public partial class Form1 : Form
     {
+        string defaultName = "New Folder";
+        string currentPath = null;
+        string currenTitle = null;
+
         public Form1()
         {
             InitializeComponent();
             AddNodes();
-            ShowThisPC();
         }
-        string texto = "💻 This PC";
         public void AddNodes()
         {
             trwFile.Nodes.Clear();
@@ -44,6 +46,8 @@ namespace FileExplorer_240075
         {
             panelMain.Controls.Clear();
 
+            currentPath = null;
+            currenTitle = null;
             panelMain.Controls.Add(lblDeviceAndDrivers);
             panelMain.Controls.Add(panelCardDriveC);
 
@@ -54,6 +58,8 @@ namespace FileExplorer_240075
         {
             panelMain.Controls.Clear();
             txtDirectory.Text = $"💻  This PC  > {nomeTitulo}";
+            currentPath = caminho ;
+            currenTitle = nomeTitulo ;
 
             Label lblTitulo = new Label
             {
@@ -112,6 +118,7 @@ namespace FileExplorer_240075
                         posLeft = 20;
                         posTop += 105;
                     }
+                    
                 }
             }
             catch (UnauthorizedAccessException)
@@ -119,6 +126,17 @@ namespace FileExplorer_240075
                 MessageBox.Show("Acesso negado a esta pasta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+        private string GetUniqueFolderName(string basePath, string name)
+        {
+            string candidate = name;
+            int idx = 2;
+            while (Directory.Exists(Path.Combine(basePath, candidate)))
+                candidate = $"{name} ({idx++})";
+            return candidate;
+        }
+
+       
 
         private void txtSearch_Enter(object sender, EventArgs e)
         {
@@ -128,7 +146,6 @@ namespace FileExplorer_240075
                 txtSearch.ForeColor = Color.Black;
             }
         }
-
         private void txtSearch_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtSearch.Text))
@@ -137,7 +154,6 @@ namespace FileExplorer_240075
                 txtSearch.ForeColor = Color.Gray;
             }
         }
-
         private void btnSort_Click(object sender, EventArgs e)
         {
             menuSort.Show(btnSort, new Point(0, btnSort.Height));
@@ -150,29 +166,25 @@ namespace FileExplorer_240075
         }
         private void btnNew_Click(object sender, EventArgs e)
         {
-            string currentDirectory = txtDirectory.Text;
-            if(string.IsNullOrEmpty(currentDirectory))
+            menuNew.Show(btnNew, new Point(0, btnNew.Height));
+        }
+        private void stripFolder_Click(object sender, EventArgs e)
+        {
+            if(currentPath == null)
             {
-                MessageBox.Show("Precisa de ter algum diretório selecionado para poder criar uma nova pasta.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("You need to have a directory selected to create a folder", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             try
             {
-                string newFolderPath = Path.Combine(currentDirectory, "Nova Pasta");
-
-                int counter = 1;
-                string originalPath = newFolderPath;
-                while(Directory.Exists(newFolderPath))
-                {
-                    newFolderPath = $"{originalPath} ({counter})";
-                    counter++;
-                }
-                Directory.CreateDirectory(newFolderPath);
-                MessageBox.Show("Pasta Criada", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string name = GetUniqueFolderName(currentPath, defaultName);
+                Directory.CreateDirectory(Path.Combine(currentPath, name));
+                OpenFolder(currentPath, currenTitle);
             }
-            catch(Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                MessageBox.Show($"Ocorreu um erro ao criar a pasta: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The acess to this folder as reject", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         private void trwFile_AfterSelect(object sender, TreeViewEventArgs e)
