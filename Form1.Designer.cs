@@ -29,6 +29,22 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("🏠 Home");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("🖼️ Gallery");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("🖥️ Desktop");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("📥 Downloads");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("📄 Documents");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("🖼️ Pictures");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("🎵 Music");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("🎬 Videos");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("📌 Quick Access", new System.Windows.Forms.TreeNode[] {
+            treeNode3,
+            treeNode4,
+            treeNode5,
+            treeNode6,
+            treeNode7,
+            treeNode8});
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("💻 This PC");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panelTop = new System.Windows.Forms.Panel();
             this.txtSearch = new System.Windows.Forms.TextBox();
@@ -64,23 +80,15 @@
             this.detailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.panelMain = new System.Windows.Forms.Panel();
-            this.panelCardDriveC = new System.Windows.Forms.Panel();
-            this.lblSpacePC1 = new System.Windows.Forms.Label();
-            this.pbPC1 = new System.Windows.Forms.ProgressBar();
-            this.labelPC1 = new System.Windows.Forms.Label();
-            this.lblIconDisk = new System.Windows.Forms.Label();
-            this.lblDeviceAndDrivers = new System.Windows.Forms.Label();
             this.menuNew = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.stripFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.stripTXT = new System.Windows.Forms.ToolStripMenuItem();
+            this.lsvExplorer = new System.Windows.Forms.ListView();
             this.panelTop.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelToolBar.SuspendLayout();
             this.menuSort.SuspendLayout();
             this.menuView.SuspendLayout();
-            this.panelMain.SuspendLayout();
-            this.panelCardDriveC.SuspendLayout();
             this.menuNew.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -106,7 +114,7 @@
             this.txtSearch.ForeColor = System.Drawing.Color.Gray;
             this.txtSearch.Location = new System.Drawing.Point(637, 5);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(151, 23);
+            this.txtSearch.Size = new System.Drawing.Size(151, 27);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.Text = "Search This PC";
             this.txtSearch.Enter += new System.EventHandler(this.txtSearch_Enter);
@@ -120,7 +128,7 @@
             this.txtDirectory.Font = new System.Drawing.Font("Segoe UI Emoji", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtDirectory.Location = new System.Drawing.Point(221, 6);
             this.txtDirectory.Name = "txtDirectory";
-            this.txtDirectory.Size = new System.Drawing.Size(410, 23);
+            this.txtDirectory.Size = new System.Drawing.Size(410, 27);
             this.txtDirectory.TabIndex = 1;
             this.txtDirectory.Text = "💻  This PC  >";
             // 
@@ -208,10 +216,36 @@
             this.trwFile.ItemHeight = 30;
             this.trwFile.Location = new System.Drawing.Point(0, -3);
             this.trwFile.Name = "trwFile";
+            treeNode1.Name = "nodeHome";
+            treeNode1.Text = "🏠 Home";
+            treeNode2.Name = "nodeGallery";
+            treeNode2.Text = "🖼️ Gallery";
+            treeNode3.Name = "nodeDesktop";
+            treeNode3.Text = "🖥️ Desktop";
+            treeNode4.Name = "nodeDownloads";
+            treeNode4.Text = "📥 Downloads";
+            treeNode5.Name = "nodeDownloads";
+            treeNode5.Text = "📄 Documents";
+            treeNode6.Name = "nodePictures";
+            treeNode6.Text = "🖼️ Pictures";
+            treeNode7.Name = "nodeMusic";
+            treeNode7.Text = "🎵 Music";
+            treeNode8.Name = "nodeVideos";
+            treeNode8.Text = "🎬 Videos";
+            treeNode9.Name = "nodeQuickAcess";
+            treeNode9.Text = "📌 Quick Access";
+            treeNode10.Name = "nodeThisPC";
+            treeNode10.Text = "💻 This PC";
+            this.trwFile.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode9,
+            treeNode10});
             this.trwFile.ShowLines = false;
             this.trwFile.ShowPlusMinus = false;
             this.trwFile.Size = new System.Drawing.Size(246, 493);
             this.trwFile.TabIndex = 0;
+            this.trwFile.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.trwFile_BeforeExpand);
             this.trwFile.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trwFile_AfterSelect);
             // 
             // panelToolBar
@@ -363,24 +397,24 @@
             this.dateToolStripMenuItem,
             this.sizeToolStripMenuItem});
             this.menuSort.Name = "menuSort";
-            this.menuSort.Size = new System.Drawing.Size(150, 70);
+            this.menuSort.Size = new System.Drawing.Size(176, 76);
             // 
             // nameToolStripMenuItem
             // 
             this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-            this.nameToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.nameToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.nameToolStripMenuItem.Text = "Name";
             // 
             // dateToolStripMenuItem
             // 
             this.dateToolStripMenuItem.Name = "dateToolStripMenuItem";
-            this.dateToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.dateToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.dateToolStripMenuItem.Text = "Date Modified";
             // 
             // sizeToolStripMenuItem
             // 
             this.sizeToolStripMenuItem.Name = "sizeToolStripMenuItem";
-            this.sizeToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.sizeToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.sizeToolStripMenuItem.Text = "Size";
             // 
             // menuView
@@ -396,36 +430,36 @@
             this.tilesToolStripMenuItem,
             this.contentToolStripMenuItem});
             this.menuView.Name = "menuView";
-            this.menuView.Size = new System.Drawing.Size(160, 180);
+            this.menuView.Size = new System.Drawing.Size(188, 212);
             // 
             // extraLargeIconsToolStripMenuItem
             // 
             this.extraLargeIconsToolStripMenuItem.Name = "extraLargeIconsToolStripMenuItem";
-            this.extraLargeIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.extraLargeIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.extraLargeIconsToolStripMenuItem.Text = "Extra large icons";
             // 
             // largeIconsToolStripMenuItem
             // 
             this.largeIconsToolStripMenuItem.Name = "largeIconsToolStripMenuItem";
-            this.largeIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.largeIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.largeIconsToolStripMenuItem.Text = "Large icons";
             // 
             // mediumIconsToolStripMenuItem
             // 
             this.mediumIconsToolStripMenuItem.Name = "mediumIconsToolStripMenuItem";
-            this.mediumIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.mediumIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.mediumIconsToolStripMenuItem.Text = "Medium icons";
             // 
             // smallIconsToolStripMenuItem
             // 
             this.smallIconsToolStripMenuItem.Name = "smallIconsToolStripMenuItem";
-            this.smallIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.smallIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.smallIconsToolStripMenuItem.Text = "Small icons";
             // 
             // listToolStripMenuItem
             // 
             this.listToolStripMenuItem.Name = "listToolStripMenuItem";
-            this.listToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.listToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.listToolStripMenuItem.Text = "List";
             // 
             // detailsToolStripMenuItem
@@ -433,124 +467,62 @@
             this.detailsToolStripMenuItem.Checked = true;
             this.detailsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.detailsToolStripMenuItem.Text = "Details";
             // 
             // tilesToolStripMenuItem
             // 
             this.tilesToolStripMenuItem.Name = "tilesToolStripMenuItem";
-            this.tilesToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.tilesToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.tilesToolStripMenuItem.Text = "Tiles";
             // 
             // contentToolStripMenuItem
             // 
             this.contentToolStripMenuItem.Name = "contentToolStripMenuItem";
-            this.contentToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.contentToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.contentToolStripMenuItem.Text = "Content";
-            // 
-            // panelMain
-            // 
-            this.panelMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelMain.AutoScroll = true;
-            this.panelMain.BackColor = System.Drawing.Color.White;
-            this.panelMain.Controls.Add(this.panelCardDriveC);
-            this.panelMain.Controls.Add(this.lblDeviceAndDrivers);
-            this.panelMain.Location = new System.Drawing.Point(255, 103);
-            this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(544, 457);
-            this.panelMain.TabIndex = 4;
-            // 
-            // panelCardDriveC
-            // 
-            this.panelCardDriveC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelCardDriveC.Controls.Add(this.lblSpacePC1);
-            this.panelCardDriveC.Controls.Add(this.pbPC1);
-            this.panelCardDriveC.Controls.Add(this.labelPC1);
-            this.panelCardDriveC.Controls.Add(this.lblIconDisk);
-            this.panelCardDriveC.Location = new System.Drawing.Point(3, 26);
-            this.panelCardDriveC.Name = "panelCardDriveC";
-            this.panelCardDriveC.Size = new System.Drawing.Size(280, 75);
-            this.panelCardDriveC.TabIndex = 1;
-            // 
-            // lblSpacePC1
-            // 
-            this.lblSpacePC1.AutoSize = true;
-            this.lblSpacePC1.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSpacePC1.ForeColor = System.Drawing.Color.Gray;
-            this.lblSpacePC1.Location = new System.Drawing.Point(71, 48);
-            this.lblSpacePC1.Name = "lblSpacePC1";
-            this.lblSpacePC1.Size = new System.Drawing.Size(119, 13);
-            this.lblSpacePC1.TabIndex = 3;
-            this.lblSpacePC1.Text = "222 GB free of 474 GB";
-            // 
-            // pbPC1
-            // 
-            this.pbPC1.Location = new System.Drawing.Point(75, 35);
-            this.pbPC1.Name = "pbPC1";
-            this.pbPC1.Size = new System.Drawing.Size(200, 10);
-            this.pbPC1.TabIndex = 2;
-            this.pbPC1.Value = 55;
-            // 
-            // labelPC1
-            // 
-            this.labelPC1.AutoSize = true;
-            this.labelPC1.Location = new System.Drawing.Point(71, 12);
-            this.labelPC1.Name = "labelPC1";
-            this.labelPC1.Size = new System.Drawing.Size(103, 15);
-            this.labelPC1.TabIndex = 1;
-            this.labelPC1.Text = "Windows-SSD (C:)";
-            // 
-            // lblIconDisk
-            // 
-            this.lblIconDisk.AutoSize = true;
-            this.lblIconDisk.Font = new System.Drawing.Font("Segoe UI Emoji", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIconDisk.Location = new System.Drawing.Point(9, 12);
-            this.lblIconDisk.Name = "lblIconDisk";
-            this.lblIconDisk.Size = new System.Drawing.Size(52, 36);
-            this.lblIconDisk.TabIndex = 0;
-            this.lblIconDisk.Text = "🖥️";
-            // 
-            // lblDeviceAndDrivers
-            // 
-            this.lblDeviceAndDrivers.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.lblDeviceAndDrivers.AutoSize = true;
-            this.lblDeviceAndDrivers.ForeColor = System.Drawing.Color.Blue;
-            this.lblDeviceAndDrivers.Location = new System.Drawing.Point(13, 3);
-            this.lblDeviceAndDrivers.Name = "lblDeviceAndDrivers";
-            this.lblDeviceAndDrivers.Size = new System.Drawing.Size(117, 15);
-            this.lblDeviceAndDrivers.TabIndex = 0;
-            this.lblDeviceAndDrivers.Text = "˅  Devices and drives";
             // 
             // menuNew
             // 
+            this.menuNew.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuNew.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.stripFolder,
             this.stripTXT});
             this.menuNew.Name = "menuNew";
-            this.menuNew.Size = new System.Drawing.Size(155, 48);
+            this.menuNew.Size = new System.Drawing.Size(179, 52);
             // 
             // stripFolder
             // 
             this.stripFolder.Name = "stripFolder";
-            this.stripFolder.Size = new System.Drawing.Size(154, 22);
+            this.stripFolder.Size = new System.Drawing.Size(178, 24);
             this.stripFolder.Text = "Folder";
-            this.stripFolder.Click += new System.EventHandler(this.stripFolder_Click);
             // 
             // stripTXT
             // 
             this.stripTXT.Name = "stripTXT";
-            this.stripTXT.Size = new System.Drawing.Size(154, 22);
+            this.stripTXT.Size = new System.Drawing.Size(178, 24);
             this.stripTXT.Text = "Text Document";
+            // 
+            // lsvExplorer
+            // 
+            this.lsvExplorer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lsvExplorer.HideSelection = false;
+            this.lsvExplorer.Location = new System.Drawing.Point(253, 106);
+            this.lsvExplorer.Name = "lsvExplorer";
+            this.lsvExplorer.Size = new System.Drawing.Size(543, 454);
+            this.lsvExplorer.TabIndex = 10;
+            this.lsvExplorer.UseCompatibleStateImageBehavior = false;
+            this.lsvExplorer.View = System.Windows.Forms.View.Details;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(800, 562);
-            this.Controls.Add(this.panelMain);
+            this.Controls.Add(this.lsvExplorer);
             this.Controls.Add(this.panelToolBar);
             this.Controls.Add(this.panelLeft);
             this.Controls.Add(this.panelTop);
@@ -566,10 +538,6 @@
             this.panelToolBar.ResumeLayout(false);
             this.menuSort.ResumeLayout(false);
             this.menuView.ResumeLayout(false);
-            this.panelMain.ResumeLayout(false);
-            this.panelMain.PerformLayout();
-            this.panelCardDriveC.ResumeLayout(false);
-            this.panelCardDriveC.PerformLayout();
             this.menuNew.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -611,16 +579,10 @@
         private System.Windows.Forms.ToolStripMenuItem contentToolStripMenuItem;
         private System.Windows.Forms.Button btnPoint;
         private System.Windows.Forms.Button btnDetails;
-        private System.Windows.Forms.Panel panelMain;
-        private System.Windows.Forms.Panel panelCardDriveC;
-        private System.Windows.Forms.Label lblDeviceAndDrivers;
-        private System.Windows.Forms.ProgressBar pbPC1;
-        private System.Windows.Forms.Label labelPC1;
-        private System.Windows.Forms.Label lblIconDisk;
-        private System.Windows.Forms.Label lblSpacePC1;
         private System.Windows.Forms.ContextMenuStrip menuNew;
         private System.Windows.Forms.ToolStripMenuItem stripFolder;
         private System.Windows.Forms.ToolStripMenuItem stripTXT;
+        private System.Windows.Forms.ListView lsvExplorer;
     }
 }
 

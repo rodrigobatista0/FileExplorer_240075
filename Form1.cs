@@ -16,127 +16,15 @@ namespace FileExplorer_240075
         string defaultName = "New Folder";
         string currentPath = null;
         string currenTitle = null;
+        List<string> backList = new List<string>();
+        List<string> forwardList = new List<string>();
 
         public Form1()
         {
             InitializeComponent();
-            AddNodes();
+            ConfigureTree();
+            ConfigurarListView();
         }
-        public void AddNodes()
-        {
-            trwFile.Nodes.Clear();
-
-            trwFile.Nodes.Add("🏠 Home");
-            trwFile.Nodes.Add("🖼️ Gallery");
-
-            TreeNode quickAcessNodes = trwFile.Nodes.Add("📌 Quick Access");
-            quickAcessNodes.Nodes.Add("🖥️ Desktop");
-            quickAcessNodes.Nodes.Add("📥 Downloads");
-            quickAcessNodes.Nodes.Add("📄 Documents");
-            quickAcessNodes.Nodes.Add("🖼️ Pictures");
-            quickAcessNodes.Nodes.Add("🎵 Music");
-            quickAcessNodes.Nodes.Add("🎬 Videos");
-
-            quickAcessNodes.Expand();
-
-            trwFile.Nodes.Add("💻 This PC");
-        }
-
-        public void ShowThisPC()
-        {
-            panelMain.Controls.Clear();
-
-            currentPath = null;
-            currenTitle = null;
-            panelMain.Controls.Add(lblDeviceAndDrivers);
-            panelMain.Controls.Add(panelCardDriveC);
-
-            txtDirectory.Text = "💻  This PC  >";
-        }
-
-        public void OpenFolder(string caminho, string nomeTitulo)
-        {
-            panelMain.Controls.Clear();
-            txtDirectory.Text = $"💻  This PC  > {nomeTitulo}";
-            currentPath = caminho ;
-            currenTitle = nomeTitulo ;
-
-            Label lblTitulo = new Label
-            {
-                Text = nomeTitulo,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                Location = new Point(20, 20),
-                AutoSize = true
-            };
-            panelMain.Controls.Add(lblTitulo);
-
-            try
-            {
-                string[] subpastas = Directory.GetDirectories(caminho);
-                int posTop = 60;
-                int posLeft = 20;
-
-                foreach (string s in subpastas)
-                {
-                    DirectoryInfo dirInfo = new DirectoryInfo(s);
-                    if ((dirInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        continue;
-
-                    Panel cardPasta = new Panel
-                    {
-                        Location = new Point(posLeft, posTop),
-                        Size = new Size(110, 90),
-                        BackColor = Color.White,
-                        Cursor = Cursors.Hand,
-                        BorderStyle = BorderStyle.FixedSingle
-                    };
-
-                    Label lblIcon = new Label
-                    {
-                        Text = "📁",
-                        Font = new Font("Segoe UI Emoji", 24F),
-                        Location = new Point(32, 10),
-                        AutoSize = true
-                    };
-
-                    Label lblNome = new Label
-                    {
-                        Text = dirInfo.Name,
-                        Font = new Font("Segoe UI", 8.5F),
-                        Location = new Point(5, 58),
-                        Size = new Size(100, 28),
-                        TextAlign = ContentAlignment.MiddleCenter
-                    };
-
-                    cardPasta.Controls.Add(lblIcon);
-                    cardPasta.Controls.Add(lblNome);
-                    panelMain.Controls.Add(cardPasta);
-
-                    posLeft += 130;
-                    if (posLeft > panelMain.Width - 140)
-                    {
-                        posLeft = 20;
-                        posTop += 105;
-                    }
-                    
-                }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("Acesso negado a esta pasta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private string GetUniqueFolderName(string basePath, string name)
-        {
-            string candidate = name;
-            int idx = 2;
-            while (Directory.Exists(Path.Combine(basePath, candidate)))
-                candidate = $"{name} ({idx++})";
-            return candidate;
-        }
-
-       
 
         private void txtSearch_Enter(object sender, EventArgs e)
         {
@@ -158,65 +46,118 @@ namespace FileExplorer_240075
         {
             menuSort.Show(btnSort, new Point(0, btnSort.Height));
         }
-
         private void btnView_Click(object sender, EventArgs e)
         {
             menuView.Show(btnView, new Point(0, btnView.Height));
-
         }
         private void btnNew_Click(object sender, EventArgs e)
         {
             menuNew.Show(btnNew, new Point(0, btnNew.Height));
         }
-        private void stripFolder_Click(object sender, EventArgs e)
+
+        private void SetTag(string key, string path)
         {
-            if(currentPath == null)
+            TreeNode[] found = trwFile.Nodes.Find(key, true);
+            if (found.Length > 0)
             {
-                MessageBox.Show("You need to have a directory selected to create a folder", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                found[0].Tag = path;
+            }
+        }
+        private void ConfigureTree()
+        {
+            string user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            SetTag("nodeHome", user);
+            SetTag("nodeGallery", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+            SetTag("nodeDesktop", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+            SetTag("nodeDownloads", Path.Combine(user, "Downloads"));
+            SetTag("nodeDocuments", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            SetTag("nodePictures", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+            SetTag("nodeMusic", Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+            SetTag("nodeVideos", Environment.GetFolderPath(Environment.SpecialFolder.MyVideos));
+
+            TreeNode pc = trwFile.Nodes["nodeThisPC"];
+            pc.Tag = "";
+
+            foreach (DriveInfo drive in DriveInfo.GetDrives())
+            {
+                if (drive.IsReady == false)
+                {
+                    continue;  
+                }
+
+                TreeNode node = new TreeNode("💾 " + drive.Name);
+                node.Tag = drive.RootDirectory.FullName;
+                node.Nodes.Add("...");  
+                pc.Nodes.Add(node);
             }
 
-            try
+            trwFile.Nodes["nodeQuickAcess"].Expand();
+            pc.Expand();
+        }
+
+
+        private void trwFile_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            TreeNode node = e.Node;
+
+            if (node.Nodes.Count == 1 && node.Nodes[0].Text == "...")
             {
-                string name = GetUniqueFolderName(currentPath, defaultName);
-                Directory.CreateDirectory(Path.Combine(currentPath, name));
-                OpenFolder(currentPath, currenTitle);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("The acess to this folder as reject", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                node.Nodes.Clear();
+
+                if (node.Tag == null || node.Tag.ToString() == "")
+                {
+                    return;
+                }
+
+                try
+                {
+                    string[] folders = Directory.GetDirectories(node.Tag.ToString());
+
+                    foreach (string folder in folders)
+                    {
+                        DirectoryInfo info = new DirectoryInfo(folder);
+
+                        // não mostra pastas escondidas
+                        if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                        {
+                            continue;
+                        }
+
+                        TreeNode child = new TreeNode(info.Name);
+                        child.Tag = info.FullName;
+                        child.Nodes.Add("...");
+                        node.Nodes.Add(child);
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
+                catch (IOException)
+                {
+                }
             }
         }
         private void trwFile_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.Text.Contains("This PC"))
+            if (e.Node.Tag == null)
             {
-                ShowThisPC();
+                return;
             }
-            else if (e.Node.Text.Contains("Documents"))
-            {
-                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents");
-            }
-            else if (e.Node.Text.Contains("Downloads"))
-            {
-                OpenFolder(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"), "Downloads");
-            }
-            else if (e.Node.Text.Contains("Desktop"))
-            {
-                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Desktop");
-            }
-            else if (e.Node.Text.Contains("Pictures"))
-            {
-                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Pictures");
-            }
-            else if (e.Node.Text.Contains("Music"))
-            {
-                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Music");
-            }
-            else if (e.Node.Text.Contains("Videos"))
-            {
-                OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Videos");
-            }
+
+            OpenFolder(e.Node.Tag.ToString());
+        }
+
+        private void ConfigurarListView()
+        {
+            lsvExplorer.View = View.Details;
+            lsvExplorer.FullRowSelect = true;
+            lsvExplorer.Columns.Clear();
+            lsvExplorer.Columns.Add("Name", 260);
+            lsvExplorer.Columns.Add("Date modified", 140);
+            lsvExplorer.Columns.Add("Type", 120);
+            lsvExplorer.Columns.Add("Size", 90, HorizontalAlignment.Right);
+            lsvExplorer.SmallImageList = imlFileExplorer;
         }
     }
 }
