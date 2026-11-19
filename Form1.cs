@@ -18,21 +18,9 @@ namespace FileExplorer_240075
         public Form1()
         {
             InitializeComponent();
-
-            this.KeyPreview = true;
-
+            lsvExplorer.View = View.Tile;
             ConfigureTree();
             ConfigureList();
-
-            trwFile.AfterSelect += trwFile_AfterSelect;
-            trwFile.BeforeExpand += trwFile_BeforeExpand;
-            lsvExplorer.DoubleClick += lsvExplorer_DoubleClick;
-            btnBack.Click += btnBack_Click;
-            btnForward.Click += btnForward_Click;
-            btnUp.Click += btnUp_Click;
-            btnRefresh.Click += btnRefresh_Click;
-            this.KeyDown += Form1_KeyDown;
-
             OpenFolder("");
         }
 
@@ -80,6 +68,16 @@ namespace FileExplorer_240075
 
         private void ConfigureTree()
         {
+
+            if (txtDirectory.Text == "💻  This PC  >")
+            {
+                lsvExplorer.View = View.Tile;
+            }
+
+            if (txtDirectory.Text != "💻  This PC  >")
+            {
+                lsvExplorer.View = View.Details;
+            }
             string user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             SetTag("nodeHome", user);
@@ -158,8 +156,8 @@ namespace FileExplorer_240075
             {
                 return;
             }
-
             OpenFolder(e.Node.Tag.ToString());
+
         }
 
         private void ConfigureList()
@@ -314,7 +312,6 @@ namespace FileExplorer_240075
                 backList.Add(currentPath);
                 forwardList.Clear();
             }
-
             ShowPath(path);
         }
 
