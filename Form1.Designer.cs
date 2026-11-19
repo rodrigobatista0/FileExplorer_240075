@@ -131,6 +131,9 @@
             this.txtDirectory.Size = new System.Drawing.Size(410, 23);
             this.txtDirectory.TabIndex = 1;
             this.txtDirectory.Text = "💻  This PC  >";
+            this.txtDirectory.Enter += new System.EventHandler(this.txtDirectory_Enter);
+            this.txtDirectory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtDirectory_KeyDown);
+            this.txtDirectory.Leave += new System.EventHandler(this.txtDirectory_Leave);
             // 
             // btnRefresh
             // 
