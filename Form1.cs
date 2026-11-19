@@ -9,13 +9,19 @@ namespace FileExplorer_240075
 {
     public partial class Form1 : Form
     {
+        #region Campos e construtor
+
         string currentPath = null;
         string currentTitle = null;
         private const string ThisPcText = "💻  This PC  >";
 
-
+        // Histórico de navegação
         List<string> backList = new List<string>();
         List<string> forwardList = new List<string>();
+
+        // Área de transferência (Cut / Copy)
+        List<string> clipPaths = new List<string>();
+        bool clipIsCut = false;
 
         public Form1()
         {
@@ -25,6 +31,221 @@ namespace FileExplorer_240075
             ConfigureList();
             OpenFolder("");
         }
+
+        #endregion
+
+        #region Navegação central (OpenFolder / ShowPath)
+
+        private void OpenFolder(string path)
+        {
+            if (path != "" && Directory.Exists(path) == false)
+            {
+                MessageBox.Show("Folder not found.", "File Explorer");
+                return;
+            }
+
+            if (LoadList(path) == false)
+            {
+                return;
+            }
+
+            if (currentPath != null && currentPath != path)
+            {
+                backList.Add(currentPath);
+                forwardList.Clear();
+            }
+            ShowPath(path);
+        }
+
+        private void ShowPath(string path)
+        {
+            currentPath = path;
+
+            if (path == "")
+            {
+                currentTitle = "This PC";
+                txtDirectory.Text = "💻  This PC  >";
+            }
+            else
+            {
+                currentTitle = Path.GetFileName(path);
+                if (currentTitle == "")
+                {
+                    currentTitle = path;
+                }
+                txtDirectory.Text = path;
+            }
+
+            this.Text = currentTitle;
+
+            btnBack.Enabled = backList.Count > 0;
+            btnForward.Enabled = forwardList.Count > 0;
+            btnUp.Enabled = path != "";
+        }
+
+        #endregion
+
+        #region Botões Back / Forward / Up / Refresh
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            GoHistory(backList, forwardList);
+        }
+
+        private void btnForward_Click(object sender, EventArgs e)
+        {
+            GoHistory(forwardList, backList);
+        }
+
+        private void GoHistory(List<string> from, List<string> to)
+        {
+            if (from.Count == 0)
+            {
+                return;
+            }
+
+            string destination = from[from.Count - 1];
+
+            if (destination != "" && Directory.Exists(destination) == false)
+            {
+                from.RemoveAt(from.Count - 1);
+                MessageBox.Show("Folder not found.", "File Explorer");
+                ShowPath(currentPath);
+                return;
+            }
+
+            if (LoadList(destination))
+            {
+                from.RemoveAt(from.Count - 1);
+                to.Add(currentPath);
+                ShowPath(destination);
+            }
+        }
+
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+            if (currentPath == "")
+            {
+                return;
+            }
+
+            string parent = Path.GetDirectoryName(currentPath.TrimEnd(Path.DirectorySeparatorChar));
+
+            OpenFolder(parent ?? "");
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            string path = currentPath;
+
+            while (path != "" && Directory.Exists(path) == false)
+            {
+                string parent = Path.GetDirectoryName(path.TrimEnd(Path.DirectorySeparatorChar));
+                path = parent ?? "";
+            }
+
+            if (path != currentPath)
+            {
+                OpenFolder(path);
+            }
+            else
+            {
+                LoadList(path);
+            }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Back && !(ActiveControl is TextBox))
+            {
+                btnBack.PerformClick();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.F5)
+            {
+                btnRefresh.PerformClick();
+                e.Handled = true;
+            }
+            else if (e.Alt && e.KeyCode == Keys.Up)
+            {
+                btnUp.PerformClick();
+                e.Handled = true;
+            }
+        }
+
+        #endregion
+
+        #region Barra de endereços
+
+        private void txtDirectory_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                NavigateTO(txtDirectory.Text);
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                e.SuppressKeyPress = true;
+                ShowPath(currentPath);
+                lsvExplorer.Focus();
+            }
+        }
+
+        private void txtDirectory_Enter(object sender, EventArgs e)
+        {
+            if (currentPath == "")
+            {
+                txtDirectory.Clear();
+            }
+            else
+            {
+                txtDirectory.SelectAll();
+            }
+        }
+
+        private void txtDirectory_Leave(object sender, EventArgs e)
+        {
+            ShowPath(currentPath);
+        }
+
+        private void NavigateTO(string input)
+        {
+            input = input.Trim().Trim('"');
+
+            if (input == "" || input == ThisPcText.Trim() || input.Equals("This PC", StringComparison.OrdinalIgnoreCase))
+            {
+                OpenFolder("");
+                return;
+            }
+
+            string fullpath;
+            try
+            {
+                fullpath = Path.GetFullPath(input);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("O caminho contém carateres inválidos.", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowPath(currentPath);
+                return;
+            }
+
+            if (File.Exists(fullpath))
+            {
+                OpenFile(fullpath);
+                ShowPath(currentPath);
+                return;
+            }
+
+            OpenFolder(fullpath);
+            lsvExplorer.Focus();
+        }
+
+        #endregion
+
+        #region Caixa de pesquisa
 
         private void txtSearch_Enter(object sender, EventArgs e)
         {
@@ -44,20 +265,9 @@ namespace FileExplorer_240075
             }
         }
 
-        private void btnSort_Click(object sender, EventArgs e)
-        {
-            menuSort.Show(btnSort, new Point(0, btnSort.Height));
-        }
+        #endregion
 
-        private void btnView_Click(object sender, EventArgs e)
-        {
-            menuView.Show(btnView, new Point(0, btnView.Height));
-        }
-
-        private void btnNew_Click(object sender, EventArgs e)
-        {
-            menuNew.Show(btnNew, new Point(0, btnNew.Height));
-        }
+        #region Árvore de pastas (TreeView)
 
         private void SetTag(string key, string path)
         {
@@ -70,7 +280,6 @@ namespace FileExplorer_240075
 
         private void ConfigureTree()
         {
-
             if (txtDirectory.Text == "💻  This PC  >")
             {
                 lsvExplorer.View = View.Tile;
@@ -159,8 +368,11 @@ namespace FileExplorer_240075
                 return;
             }
             OpenFolder(e.Node.Tag.ToString());
-
         }
+
+        #endregion
+
+        #region Lista de ficheiros (ListView)
 
         private void ConfigureList()
         {
@@ -270,128 +482,38 @@ namespace FileExplorer_240075
             return true;
         }
 
-        private void ShowPath(string path)
-        {
-            currentPath = path;
+        #endregion
 
-            if (path == "")
-            {
-                currentTitle = "This PC";
-                txtDirectory.Text = "💻  This PC  >";
-            }
-            else
-            {
-                currentTitle = Path.GetFileName(path);
-                if (currentTitle == "")
-                {
-                    currentTitle = path;
-                }
-                txtDirectory.Text = path;
-            }
-
-            this.Text = currentTitle;
-
-            btnBack.Enabled = backList.Count > 0;
-            btnForward.Enabled = forwardList.Count > 0;
-            btnUp.Enabled = path != "";
-        }
-
-        private void OpenFolder(string path)
-        {
-            if (path != "" && Directory.Exists(path) == false)
-            {
-                MessageBox.Show("Folder not found.", "File Explorer");
-                return;
-            }
-
-            if (LoadList(path) == false)
-            {
-                return;
-            }
-
-            if (currentPath != null && currentPath != path)
-            {
-                backList.Add(currentPath);
-                forwardList.Clear();
-            }
-            ShowPath(path);
-        }
-
-        private void btnBack_Click(object sender, EventArgs e)
-        {
-            if (backList.Count == 0)
-            {
-                return;
-            }
-
-            string destination = backList[backList.Count - 1];
-
-            if (LoadList(destination))
-            {
-                backList.RemoveAt(backList.Count - 1);
-                forwardList.Add(currentPath);
-                ShowPath(destination);
-            }
-        }
-
-        private void btnForward_Click(object sender, EventArgs e)
-        {
-            if (forwardList.Count == 0)
-            {
-                return;
-            }
-
-            string destination = forwardList[forwardList.Count - 1];
-
-            if (LoadList(destination))
-            {
-                forwardList.RemoveAt(forwardList.Count - 1);
-                backList.Add(currentPath);
-                ShowPath(destination);
-            }
-        }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-            if (currentPath == "")
-            {
-                return;
-            }
-
-            DirectoryInfo parent = Directory.GetParent(currentPath);
-
-            if (parent == null)
-            {
-                OpenFolder("");
-            }
-            else
-            {
-                OpenFolder(parent.FullName);
-            }
-        }
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            LoadList(currentPath);
-        }
-
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Back && !(ActiveControl is TextBox))
-            {
-                btnBack.PerformClick();
-                e.Handled = true;
-            }
-        }
+        #region Abrir pastas e ficheiros (duplo clique / Enter)
 
         private void lsvExplorer_DoubleClick(object sender, EventArgs e)
+        {
+            OpenSelectedItem();
+        }
+
+        private void lsvExplorer_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                OpenSelectedItem();
+            }
+        }
+
+        private void OpenSelectedItem()
         {
             if (lsvExplorer.SelectedItems.Count == 0)
             {
                 return;
             }
 
-            string path = lsvExplorer.SelectedItems[0].Tag.ToString();
+            object tag = lsvExplorer.SelectedItems[0].Tag;
+            if (tag == null)
+            {
+                return;
+            }
+
+            string path = tag.ToString();
 
             if (Directory.Exists(path))
             {
@@ -428,18 +550,39 @@ namespace FileExplorer_240075
             }
         }
 
-        List<string> clipPaths = new List<string>();
-        bool clipIsCut = false;
+        #endregion
+
+        #region Barra de ferramentas (menus Sort / View / New)
+
+        private void btnSort_Click(object sender, EventArgs e)
+        {
+            menuSort.Show(btnSort, new Point(0, btnSort.Height));
+        }
+
+        private void btnView_Click(object sender, EventArgs e)
+        {
+            menuView.Show(btnView, new Point(0, btnView.Height));
+        }
+
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+            menuNew.Show(btnNew, new Point(0, btnNew.Height));
+        }
+
+        #endregion
+
+        #region Cut / Copy / Paste
+
         private void FillClipboard(bool cut)
         {
-            if(currentPath == "" || lsvExplorer.SelectedItems.Count == 0)
+            if (currentPath == "" || lsvExplorer.SelectedItems.Count == 0)
             {
                 return;
             }
 
             clipPaths.Clear();
 
-            foreach(ListViewItem item in lsvExplorer.SelectedItems)
+            foreach (ListViewItem item in lsvExplorer.SelectedItems)
             {
                 clipPaths.Add(item.Tag.ToString());
             }
@@ -451,104 +594,6 @@ namespace FileExplorer_240075
             FillClipboard(true);
         }
 
-        private void txtDirectory_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                NavigateTO(txtDirectory.Text);
-            }
-            else if (e.KeyCode == Keys.Escape)
-            {
-                e.SuppressKeyPress = true;
-                ShowCurrentPath();
-                panelTop.Focus();
-            }
-        }
-        private void txtDirectory_Enter(object sender, EventArgs e)
-        {
-            if (currentPath == "")
-            {
-                txtDirectory.Clear();
-            }
-            else
-                txtDirectory.SelectAll();
-        }
-        private void txtDirectory_Leave(object sender, EventArgs e)
-        {
-            ShowCurrentPath();
-        }
-
-        private void NavigateTO(string input)
-        {
-            input = input.Trim().Trim('"');
-            if(input == "" || input == ThisPcText.Trim() || input.Equals("This PC", StringComparison.OrdinalIgnoreCase))
-            {
-                currentPath = "";
-                ShowCurrentPath();
-                LoadDirectory(currentPath);
-                return;
-            }
-
-            string fullpath;
-            try
-            {
-                fullpath = Path.GetFullPath(input);
-            }
-            catch(Exception ex) 
-            {
-                MessageBox.Show("O caminho contém carateres inválidos.", "Erro",MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if(File.Exists(fullpath))
-            {
-               MessageBox.Show("Isto é um ficheiro, não uma pasta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            if (!Directory.Exists(fullpath))
-            {
-                MessageBox.Show($"Não foi possível encontrar \"{fullpath}\".", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                Directory.EnumerateFileSystemEntries(fullpath).GetEnumerator().MoveNext();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("Não tens permissão para aceder a esta pasta.", "Acesso negado",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            currentPath = fullpath;
-            ShowCurrentPath();
-            LoadDirectory(currentPath);
-        }
-
-        private void ShowCurrentPath()
-        {
-            if (currentPath == "")
-            {
-                txtDirectory.Text = ThisPcText;
-                this.Text = "This PC";
-                txtSearch.Text = "Search This PC";
-            }
-            else
-            {
-                txtDirectory.Text = currentPath;
-                string name = Path.GetFileName(currentPath.TrimEnd(Path.DirectorySeparatorChar));
-                this.Text = name == "" ? currentPath : name; 
-                txtSearch.Text = "Search " + this.Text;
-            }
-        }
-
-        private void LoadDirectory(string path)
-        {
-            // Fica vazio por agora: é aqui que vamos preencher a lista de ficheiros
-        }
+        #endregion
     }
 }

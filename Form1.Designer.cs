@@ -148,6 +148,7 @@
             this.btnRefresh.TabIndex = 2;
             this.btnRefresh.Text = "↻";
             this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // btnUp
             // 
@@ -162,6 +163,7 @@
             this.btnUp.TabIndex = 1;
             this.btnUp.Text = "↑";
             this.btnUp.UseVisualStyleBackColor = true;
+            this.btnUp.Click += new System.EventHandler(this.btnUp_Click);
             // 
             // btnForward
             // 
@@ -177,6 +179,7 @@
             this.btnForward.TabIndex = 1;
             this.btnForward.Text = "→";
             this.btnForward.UseVisualStyleBackColor = true;
+            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
             // btnBack
             // 
@@ -192,6 +195,7 @@
             this.btnBack.TabIndex = 0;
             this.btnBack.Text = "←";
             this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // imlFileExplorer
             // 
@@ -519,6 +523,8 @@
             this.lsvExplorer.TabIndex = 10;
             this.lsvExplorer.UseCompatibleStateImageBehavior = false;
             this.lsvExplorer.View = System.Windows.Forms.View.Details;
+            this.lsvExplorer.DoubleClick += new System.EventHandler(this.lsvExplorer_DoubleClick);
+            this.lsvExplorer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lsvExplorer_KeyDown);
             // 
             // Form1
             // 
@@ -537,6 +543,7 @@
             this.Name = "Form1";
             this.Text = "This PC";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.panelLeft.ResumeLayout(false);
