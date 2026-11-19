@@ -374,6 +374,7 @@
             this.btnCut.TabIndex = 4;
             this.btnCut.Text = "✂️";
             this.btnCut.UseVisualStyleBackColor = true;
+            this.btnCut.Click += new System.EventHandler(this.btnCut_Click);
             // 
             // btnNew
             // 

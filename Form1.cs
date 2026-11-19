@@ -425,5 +425,28 @@ namespace FileExplorer_240075
                 MessageBox.Show(ex.Message, "Cannot open file");
             }
         }
+
+        List<string> clipPaths = new List<string>();
+        bool clipIsCut = false;
+        private void FillClipboard(bool cut)
+        {
+            if(currentPath == "" || lsvExplorer.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            clipPaths.Clear();
+
+            foreach(ListViewItem item in lsvExplorer.SelectedItems)
+            {
+                clipPaths.Add(item.Tag.ToString());
+            }
+            clipIsCut = cut;
+        }
+
+        private void btnCut_Click(object sender, EventArgs e)
+        {
+            FillClipboard(true);
+        }
     }
 }
