@@ -11,6 +11,8 @@ namespace FileExplorer_240075
     {
         string currentPath = null;
         string currentTitle = null;
+        private const string ThisPcText = "💻  This PC  >";
+
 
         List<string> backList = new List<string>();
         List<string> forwardList = new List<string>();
@@ -447,6 +449,106 @@ namespace FileExplorer_240075
         private void btnCut_Click(object sender, EventArgs e)
         {
             FillClipboard(true);
+        }
+
+        private void txtDirectory_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                NavigateTO(txtDirectory.Text);
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                e.SuppressKeyPress = true;
+                ShowCurrentPath();
+                panelTop.Focus();
+            }
+        }
+        private void txtDirectory_Enter(object sender, EventArgs e)
+        {
+            if (currentPath == "")
+            {
+                txtDirectory.Clear();
+            }
+            else
+                txtDirectory.SelectAll();
+        }
+        private void txtDirectory_Leave(object sender, EventArgs e)
+        {
+            ShowCurrentPath();
+        }
+
+        private void NavigateTO(string input)
+        {
+            input = input.Trim().Trim('"');
+            if(input == "" || input == ThisPcText.Trim() || input.Equals("This PC", StringComparison.OrdinalIgnoreCase))
+            {
+                currentPath = "";
+                ShowCurrentPath();
+                LoadDirectory(currentPath);
+                return;
+            }
+
+            string fullpath;
+            try
+            {
+                fullpath = Path.GetFullPath(input);
+            }
+            catch(Exception ex) 
+            {
+                MessageBox.Show("O caminho contém carateres inválidos.", "Erro",MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if(File.Exists(fullpath))
+            {
+               MessageBox.Show("Isto é um ficheiro, não uma pasta.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (!Directory.Exists(fullpath))
+            {
+                MessageBox.Show($"Não foi possível encontrar \"{fullpath}\".", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Directory.EnumerateFileSystemEntries(fullpath).GetEnumerator().MoveNext();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Não tens permissão para aceder a esta pasta.", "Acesso negado",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            currentPath = fullpath;
+            ShowCurrentPath();
+            LoadDirectory(currentPath);
+        }
+
+        private void ShowCurrentPath()
+        {
+            if (currentPath == "")
+            {
+                txtDirectory.Text = ThisPcText;
+                this.Text = "This PC";
+                txtSearch.Text = "Search This PC";
+            }
+            else
+            {
+                txtDirectory.Text = currentPath;
+                string name = Path.GetFileName(currentPath.TrimEnd(Path.DirectorySeparatorChar));
+                this.Text = name == "" ? currentPath : name; 
+                txtSearch.Text = "Search " + this.Text;
+            }
+        }
+
+        private void LoadDirectory(string path)
+        {
+            // Fica vazio por agora: é aqui que vamos preencher a lista de ficheiros
         }
     }
 }
