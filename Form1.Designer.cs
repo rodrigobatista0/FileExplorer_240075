@@ -29,22 +29,22 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("🏠 Home");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("🖼️ Gallery");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("🖥️ Desktop");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("📥 Downloads");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("📄 Documents");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("🖼️ Pictures");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("🎵 Music");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("🎬 Videos");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("📌 Quick Access", new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4,
-            treeNode5,
-            treeNode6,
-            treeNode7,
-            treeNode8});
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("💻 This PC");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("🏠 Home");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("🖼️ Gallery");
+            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("🖥️ Desktop");
+            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("📥 Downloads");
+            System.Windows.Forms.TreeNode treeNode15 = new System.Windows.Forms.TreeNode("📄 Documents");
+            System.Windows.Forms.TreeNode treeNode16 = new System.Windows.Forms.TreeNode("🖼️ Pictures");
+            System.Windows.Forms.TreeNode treeNode17 = new System.Windows.Forms.TreeNode("🎵 Music");
+            System.Windows.Forms.TreeNode treeNode18 = new System.Windows.Forms.TreeNode("🎬 Videos");
+            System.Windows.Forms.TreeNode treeNode19 = new System.Windows.Forms.TreeNode("📌 Quick Access", new System.Windows.Forms.TreeNode[] {
+            treeNode13,
+            treeNode14,
+            treeNode15,
+            treeNode16,
+            treeNode17,
+            treeNode18});
+            System.Windows.Forms.TreeNode treeNode20 = new System.Windows.Forms.TreeNode("💻 This PC");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panelTop = new System.Windows.Forms.Panel();
             this.txtSearch = new System.Windows.Forms.TextBox();
@@ -224,31 +224,31 @@
             this.trwFile.ItemHeight = 30;
             this.trwFile.Location = new System.Drawing.Point(0, -3);
             this.trwFile.Name = "trwFile";
-            treeNode1.Name = "nodeHome";
-            treeNode1.Text = "🏠 Home";
-            treeNode2.Name = "nodeGallery";
-            treeNode2.Text = "🖼️ Gallery";
-            treeNode3.Name = "nodeDesktop";
-            treeNode3.Text = "🖥️ Desktop";
-            treeNode4.Name = "nodeDownloads";
-            treeNode4.Text = "📥 Downloads";
-            treeNode5.Name = "nodeDownloads";
-            treeNode5.Text = "📄 Documents";
-            treeNode6.Name = "nodePictures";
-            treeNode6.Text = "🖼️ Pictures";
-            treeNode7.Name = "nodeMusic";
-            treeNode7.Text = "🎵 Music";
-            treeNode8.Name = "nodeVideos";
-            treeNode8.Text = "🎬 Videos";
-            treeNode9.Name = "nodeQuickAcess";
-            treeNode9.Text = "📌 Quick Access";
-            treeNode10.Name = "nodeThisPC";
-            treeNode10.Text = "💻 This PC";
+            treeNode11.Name = "nodeHome";
+            treeNode11.Text = "🏠 Home";
+            treeNode12.Name = "nodeGallery";
+            treeNode12.Text = "🖼️ Gallery";
+            treeNode13.Name = "nodeDesktop";
+            treeNode13.Text = "🖥️ Desktop";
+            treeNode14.Name = "nodeDownloads";
+            treeNode14.Text = "📥 Downloads";
+            treeNode15.Name = "nodeDownloads";
+            treeNode15.Text = "📄 Documents";
+            treeNode16.Name = "nodePictures";
+            treeNode16.Text = "🖼️ Pictures";
+            treeNode17.Name = "nodeMusic";
+            treeNode17.Text = "🎵 Music";
+            treeNode18.Name = "nodeVideos";
+            treeNode18.Text = "🎬 Videos";
+            treeNode19.Name = "nodeQuickAcess";
+            treeNode19.Text = "📌 Quick Access";
+            treeNode20.Name = "nodeThisPC";
+            treeNode20.Text = "💻 This PC";
             this.trwFile.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2,
-            treeNode9,
-            treeNode10});
+            treeNode11,
+            treeNode12,
+            treeNode19,
+            treeNode20});
             this.trwFile.ShowLines = false;
             this.trwFile.ShowPlusMinus = false;
             this.trwFile.Size = new System.Drawing.Size(246, 493);
@@ -442,7 +442,8 @@
             this.tilesToolStripMenuItem,
             this.contentToolStripMenuItem});
             this.menuView.Name = "menuView";
-            this.menuView.Size = new System.Drawing.Size(188, 212);
+            this.menuView.Size = new System.Drawing.Size(211, 240);
+            this.menuView.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuView_ItemClicked);
             // 
             // extraLargeIconsToolStripMenuItem
             // 

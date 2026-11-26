@@ -14,6 +14,9 @@ namespace FileExplorer_240075
     {
         #region Campos e construtor
 
+        ImageList imlLarge = new ImageList(); 
+        View folderView = View.Details;
+        int folderIconSize = 0;
         string currentPath = null;
         string currentTitle = null;
         private const string ThisPcText = "💻  This PC  >";
@@ -29,7 +32,6 @@ namespace FileExplorer_240075
         public Form1()
         {
             InitializeComponent();
-            lsvExplorer.View = View.Tile;
             ConfigureTree();
             ConfigureList();
             OpenFolder("");
@@ -62,6 +64,8 @@ namespace FileExplorer_240075
 
         private void ShowPath(string path)
         {
+            bool changedKind = (currentPath == "") != (path == "");
+
             currentPath = path;
 
             if (path == "")
@@ -84,6 +88,18 @@ namespace FileExplorer_240075
             btnBack.Enabled = backList.Count > 0;
             btnForward.Enabled = forwardList.Count > 0;
             btnUp.Enabled = path != "";
+
+            if (changedKind)
+            {
+                if (path == "")
+                {
+                    ApplyView(View.Tile, 48);
+                }
+                else
+                {
+                    ApplyView(folderView, folderIconSize);
+                }
+            }
         }
 
         #endregion
@@ -321,6 +337,11 @@ namespace FileExplorer_240075
                     return;
                 }
 
+                foreach (ListViewItem item in results)
+                {
+                    SetIcon(item);
+                }
+
                 lsvExplorer.Items.Clear();
                 lsvExplorer.Items.AddRange(results.ToArray());
                 this.Text = "Search results (" + results.Count + ")";
@@ -421,11 +442,6 @@ namespace FileExplorer_240075
 
         private void ConfigureTree()
         {
-            if (txtDirectory.Text == "💻  This PC  >")
-            {
-                lsvExplorer.View = View.Tile;
-            }
-
             if (txtDirectory.Text != "💻  This PC  >")
             {
                 lsvExplorer.View = View.Details;
@@ -517,7 +533,13 @@ namespace FileExplorer_240075
 
         private void ConfigureList()
         {
-            lsvExplorer.View = View.Details;
+            imlFileExplorer.ColorDepth = ColorDepth.Depth32Bit;
+            imlLarge.ColorDepth = ColorDepth.Depth32Bit;
+            imlLarge.ImageSize = new Size(32, 32);
+
+            lsvExplorer.SmallImageList = imlFileExplorer;
+            lsvExplorer.LargeImageList = imlLarge;        
+
             lsvExplorer.FullRowSelect = true;
 
             lsvExplorer.Columns.Clear();
@@ -525,6 +547,91 @@ namespace FileExplorer_240075
             lsvExplorer.Columns.Add("Date modified", 140);
             lsvExplorer.Columns.Add("Type", 120);
             lsvExplorer.Columns.Add("Size", 90);
+        }
+
+        private void SetIcon(ListViewItem item)
+        {
+            string path = item.Tag.ToString();
+            string key;
+
+            if (Directory.Exists(path))
+            {
+                key = path.Length <= 3 ? "drive" : "folder";
+            }
+            else
+            {
+                string ext = Path.GetExtension(path).ToLower();
+
+                if (ext == "")
+                {
+                    key = "file";
+                }
+                else if (ext == ".exe" || ext == ".ico" || ext == ".lnk")
+                {
+                    key = path.ToLower();
+                }
+                else
+                {
+                    key = ext;
+                }
+            }
+
+            if (imlFileExplorer.Images.ContainsKey(key) == false)
+            {
+                try
+                {
+                    if (key == "folder")
+                    {
+                        Bitmap bmp = DrawFolderIcon();
+                        imlFileExplorer.Images.Add(key, bmp);
+                        imlLarge.Images.Add(key, bmp);
+                    }
+                    else if (key == "drive")
+                    {
+                        Bitmap bmp = DrawDriveIcon();
+                        imlFileExplorer.Images.Add(key, bmp);
+                        imlLarge.Images.Add(key, bmp);
+                    }
+                    else
+                    {
+                        Icon icon = Icon.ExtractAssociatedIcon(path);
+                        imlFileExplorer.Images.Add(key, icon);
+                        imlLarge.Images.Add(key, icon);
+                    }
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            }
+
+            item.ImageKey = key;
+        }
+        private Bitmap DrawFolderIcon()
+        {
+            Bitmap bmp = new Bitmap(32, 32);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.FillRectangle(Brushes.Goldenrod, 2, 5, 12, 6);
+                g.FillRectangle(Brushes.Gold, 2, 9, 28, 19);      
+                g.DrawRectangle(Pens.DarkGoldenrod, 2, 9, 28, 19);   
+            }
+
+            return bmp;
+        }
+        private Bitmap DrawDriveIcon()
+        {
+            Bitmap bmp = new Bitmap(32, 32);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.FillRectangle(Brushes.LightGray, 2, 10, 28, 14);
+                g.DrawRectangle(Pens.DimGray, 2, 10, 28, 14);
+                g.FillRectangle(Brushes.LimeGreen, 24, 18, 3, 3);     
+            }
+
+            return bmp;
         }
 
         private string FormatSize(long bytes)
@@ -616,6 +723,11 @@ namespace FileExplorer_240075
             {
                 MessageBox.Show(ex.Message, "File Explorer");
                 return false;
+            }
+
+            foreach (ListViewItem item in items)
+            {
+                SetIcon(item);
             }
 
             lsvExplorer.Items.Clear();
@@ -1066,8 +1178,71 @@ namespace FileExplorer_240075
             }
         }
 
+
         #endregion
 
+        #region MenuView
+        private void menuView_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            ToolStripItem clicked = e.ClickedItem;
 
+            if (clicked == extraLargeIconsToolStripMenuItem)
+            {
+                SetView(View.LargeIcon, 128);
+            }
+            else if (clicked == largeIconsToolStripMenuItem)
+            {
+                SetView(View.LargeIcon, 96);
+            }
+            else if (clicked == mediumIconsToolStripMenuItem)
+            {
+                SetView(View.LargeIcon, 64);
+            }
+            else if (clicked == smallIconsToolStripMenuItem)
+            {
+                SetView(View.SmallIcon, 0);
+            }
+            else if (clicked == listToolStripMenuItem)
+            {
+                SetView(View.List, 0);
+            }
+            else if (clicked == detailsToolStripMenuItem)
+            {
+                SetView(View.Details, 0);
+            }
+            else if (clicked == tilesToolStripMenuItem)
+            {
+                SetView(View.Tile, 48);
+            }
+            else if (clicked == contentToolStripMenuItem)
+            {
+                SetView(View.Tile, 64);
+            }
+            else
+            {
+                return;
+            }
+
+            foreach (ToolStripItem item in menuView.Items)
+            {
+                ToolStripMenuItem menuItem = item as ToolStripMenuItem;
+                if (menuItem != null)
+                {
+                    menuItem.Checked = (menuItem == clicked);
+                }
+            }
+        }
+
+        private void SetView(View view, int iconSize)
+        {
+            folderView = view;
+            folderIconSize = iconSize;
+            ApplyView(view, iconSize);
+        }
+        private void ApplyView(View view, int iconSize)
+        {
+            lsvExplorer.View = view;
+        }
+        #endregion
     }
 }
