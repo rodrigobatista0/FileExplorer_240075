@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using VB = Microsoft.VisualBasic.FileIO;
 
 namespace FileExplorer_240075
 {
@@ -171,6 +174,34 @@ namespace FileExplorer_240075
                 btnUp.PerformClick();
                 e.Handled = true;
             }
+            else if (e.Control && !(ActiveControl is TextBox))
+            {
+                if (e.KeyCode == Keys.C)
+                {
+                    FillClipboard(false);
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.X)
+                {
+                    FillClipboard(true);
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.V)
+                {
+                    PasteItems();
+                    e.Handled = true;
+                }
+            }
+            else if (e.KeyCode == Keys.F2 && !(ActiveControl is TextBox))
+            {
+                StartRename();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Delete && !(ActiveControl is TextBox))
+            {
+                DeleteSelected();
+                e.Handled = true;
+            }
         }
 
         #endregion
@@ -264,7 +295,117 @@ namespace FileExplorer_240075
                 txtSearch.ForeColor = Color.Gray;
             }
         }
+        private async void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+            e.SuppressKeyPress = true;
 
+            string text = txtSearch.Text;
+            string folder = currentPath;
+
+            if(text == "" || text == "Search This PC")
+            {
+                return;
+            }
+            this.Text = "Searching...";
+
+            try
+            {
+                List<ListViewItem> results = await Task.Run(() => SearchAll(folder, text));
+
+                if (folder != currentPath)
+                {
+                    return;
+                }
+
+                lsvExplorer.Items.Clear();
+                lsvExplorer.Items.AddRange(results.ToArray());
+                this.Text = "Search results (" + results.Count + ")";
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Nome inválido para pesquisa.", "Search");
+                this.Text = currentTitle;
+            }
+        }
+        private List<ListViewItem> SearchAll(string folder, string text)
+        {
+            List<ListViewItem> results = new List<ListViewItem>();
+
+            if (folder == "")
+            {
+                foreach (DriveInfo drive in DriveInfo.GetDrives())
+                {
+                    if (drive.IsReady)
+                    {
+                        results.AddRange(SearchFolder(drive.RootDirectory.FullName, text));
+                    }
+                }
+            }
+            else
+            {
+                results.AddRange(SearchFolder(folder, text));
+            }
+
+            return results;
+        }
+
+        private List<ListViewItem> SearchFolder(string folder, string text)
+        {
+            List<ListViewItem> results = new List<ListViewItem>();
+
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(folder);
+
+                foreach (FileSystemInfo info in dir.EnumerateFileSystemInfos("*" + text + "*"))
+                {
+                    if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    {
+                        continue;
+                    }
+
+                    ListViewItem item = new ListViewItem(info.Name);
+                    item.SubItems.Add(info.LastWriteTime.ToString("dd/MM/yyyy HH:mm"));
+
+                    FileInfo file = info as FileInfo;
+                    if (file == null)
+                    {
+                        item.SubItems.Add("File folder");
+                        item.SubItems.Add("");
+                    }
+                    else
+                    {
+                        item.SubItems.Add(file.Extension.TrimStart('.').ToUpper() + " File");
+                        item.SubItems.Add(FormatSize(file.Length));
+                    }
+
+                    item.Tag = info.FullName;
+                    results.Add(item);
+                }
+
+                foreach (DirectoryInfo sub in dir.EnumerateDirectories())
+                {
+                    if ((sub.Attributes & (FileAttributes.Hidden | FileAttributes.ReparsePoint)) != 0)
+                    {
+                        continue;
+                    }
+
+                    results.AddRange(SearchFolder(sub.FullName, text));
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            catch (IOException)
+            {
+            }
+
+            return results;
+        }
         #endregion
 
         #region Árvore de pastas (TreeView)
@@ -593,7 +734,340 @@ namespace FileExplorer_240075
         {
             FillClipboard(true);
         }
+        private void btnCopy_Click(object sender, EventArgs e)
+        {
+            FillClipboard(false);
+        }
+
+        private void PasteItems()
+        {
+            if (currentPath == "" || clipPaths.Count == 0)
+            {
+                return;
+            }
+
+            List<string> errors = new List<string>();
+
+            foreach (string source in clipPaths)
+            {
+                string name = Path.GetFileName(source.TrimEnd(Path.DirectorySeparatorChar));
+
+                try
+                {
+                    bool isDir = Directory.Exists(source);
+
+                    if (isDir == false && File.Exists(source) == false)
+                    {
+                        errors.Add(name + ": já não existe.");
+                        continue;
+                    }
+
+                    if (clipIsCut && SameFolder(Path.GetDirectoryName(source), currentPath))
+                    {
+                        continue;
+                    }
+
+                    if (isDir && IsSameOrInside(currentPath, source))
+                    {
+                        errors.Add(name + ": não podes colar uma pasta dentro dela própria.");
+                        continue;
+                    }
+
+                    string dest = GetUniquePath(currentPath, name, isDir);
+
+                    if (clipIsCut)
+                    {
+                        if (isDir)
+                        {
+                            MoveDirectory(source, dest);
+                        }
+                        else
+                        {
+                            File.Move(source, dest);
+                        }
+                    }
+                    else
+                    {
+                        if (isDir)
+                        {
+                            CopyDirectory(source, dest);
+                        }
+                        else
+                        {
+                            File.Copy(source, dest);
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    errors.Add(name + ": acesso negado.");
+                }
+                catch (IOException ex)
+                {
+                    errors.Add(name + ": " + ex.Message);
+                }
+            }
+
+            if (clipIsCut)
+            {
+                clipPaths.Clear();
+            }
+
+            LoadList(currentPath);
+
+            if (errors.Count > 0)
+            {
+                MessageBox.Show(string.Join("\n", errors), "Paste");
+            }
+        }
+
+        private string GetUniquePath(string folder, string name, bool isDir)
+        {
+            string dest = Path.Combine(folder, name);
+
+            if (File.Exists(dest) == false && Directory.Exists(dest) == false)
+            {
+                return dest;
+            }
+
+            string baseName = isDir ? name : Path.GetFileNameWithoutExtension(name);
+            string ext = isDir ? "" : Path.GetExtension(name);
+            int n = 1;
+
+            do
+            {
+                string suffix = n == 1 ? " - Copy" : " - Copy (" + n + ")";
+                dest = Path.Combine(folder, baseName + suffix + ext);
+                n++;
+            }
+            while (File.Exists(dest) || Directory.Exists(dest));
+
+            return dest;
+        }
+
+        private void CopyDirectory(string source, string dest)
+        {
+            Directory.CreateDirectory(dest);
+
+            foreach (string file in Directory.GetFiles(source))
+            {
+                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
+            }
+
+            foreach (string sub in Directory.GetDirectories(source))
+            {
+                CopyDirectory(sub, Path.Combine(dest, Path.GetFileName(sub)));
+            }
+        }
+
+        private void MoveDirectory(string source, string dest)
+        {
+            if (string.Equals(Path.GetPathRoot(source), Path.GetPathRoot(dest), StringComparison.OrdinalIgnoreCase))
+            {
+                Directory.Move(source, dest);
+            }
+            else
+            {
+                CopyDirectory(source, dest);
+                Directory.Delete(source, true);
+            }
+        }
+
+        private bool SameFolder(string a, string b)
+        {
+            return string.Equals(a.TrimEnd('\\'), b.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsSameOrInside(string folder, string parent)
+        {
+            string a = folder.TrimEnd('\\') + "\\";
+            string b = parent.TrimEnd('\\') + "\\";
+            return a.StartsWith(b, StringComparison.OrdinalIgnoreCase);
+        }
 
         #endregion
+
+        #region Rename
+        private void btnRename_Click(object sender, EventArgs e)
+        {
+            StartRename();
+        }
+        private void StartRename()
+        {
+            if (currentPath == "" || lsvExplorer.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            lsvExplorer.SelectedItems[0].BeginEdit();  
+        }
+        private void lsvExplorer_BeforeLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            if (currentPath == "")
+            {
+                e.CancelEdit = true;
+            }
+        }
+        private void lsvExplorer_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            e.CancelEdit = true;
+
+            if (e.Label == null)
+            {
+                return;
+            }
+
+            ListViewItem item = lsvExplorer.Items[e.Item];
+            string oldPath = item.Tag.ToString();
+            string newName = e.Label.Trim();
+
+            if (newName == "")
+            {
+                MessageBox.Show("O nome não pode estar vazio.", "Rename");
+                return;
+            }
+
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                MessageBox.Show("Um nome não pode conter nenhum destes carateres:\n\\ / : * ? \" < > |", "Rename");
+                return;
+            }
+
+            string newPath = Path.Combine(Path.GetDirectoryName(oldPath), newName);
+
+            if (newPath == oldPath)
+            {
+                return;
+            }
+
+            bool onlyCase = string.Equals(oldPath, newPath, StringComparison.OrdinalIgnoreCase);
+
+            if (onlyCase == false && (File.Exists(newPath) || Directory.Exists(newPath)))
+            {
+                MessageBox.Show("Já existe um ficheiro ou pasta com esse nome.", "Rename");
+                return;
+            }
+
+            try
+            {
+                bool isDir = Directory.Exists(oldPath);
+
+                if (onlyCase)
+                {
+                    string temp = Path.Combine(Path.GetDirectoryName(oldPath), Guid.NewGuid().ToString());
+                    MovePath(oldPath, temp, isDir);
+                    MovePath(temp, newPath, isDir);
+                }
+                else
+                {
+                    MovePath(oldPath, newPath, isDir);
+                }
+
+                item.Text = newName;
+                item.Tag = newPath;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Não tens permissão para renomear este item.", "Rename");
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show(ex.Message, "Rename");
+            }
+        }
+        private void MovePath(string from, string to, bool isDir)
+        {
+            if (isDir)
+            {
+                Directory.Move(from, to);
+            }
+            else
+            {
+                File.Move(from, to);
+            }
+        }
+
+        #endregion
+
+        #region Delete
+        private void btnTrash_Click(object sender, EventArgs e)
+        {
+            DeleteSelected();
+
+        }
+
+        private void DeleteSelected()
+        {
+            if (currentPath == "" || lsvExplorer.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            string question;
+            if (lsvExplorer.SelectedItems.Count == 1)
+            {
+                question = "Mover \"" + lsvExplorer.SelectedItems[0].Text + "\" para a Reciclagem?";
+            }
+            else
+            {
+                question = "Mover " + lsvExplorer.SelectedItems.Count + " itens para a Reciclagem?";
+            }
+
+            DialogResult answer = MessageBox.Show(question, "Delete",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
+            if (answer != DialogResult.Yes)
+            {
+                return;
+            }
+
+            List<ListViewItem> deleted = new List<ListViewItem>();
+            List<string> errors = new List<string>();
+
+            foreach (ListViewItem item in lsvExplorer.SelectedItems)
+            {
+                string path = item.Tag.ToString();
+
+                try
+                {
+                    if (Directory.Exists(path))
+                    {
+                        VB.FileSystem.DeleteDirectory(path, VB.UIOption.OnlyErrorDialogs, VB.RecycleOption.SendToRecycleBin);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        VB.FileSystem.DeleteFile(path, VB.UIOption.OnlyErrorDialogs, VB.RecycleOption.SendToRecycleBin);
+                    }
+
+                    deleted.Add(item);                 
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    errors.Add(item.Text + ": acesso negado.");
+                }
+                catch (OperationCanceledException)
+                {
+                   
+                }
+                catch (IOException ex)
+                {
+                    errors.Add(item.Text + ": " + ex.Message);
+                }
+            }
+
+            foreach (ListViewItem item in deleted)
+            {
+                lsvExplorer.Items.Remove(item);
+            }
+
+            if (errors.Count > 0)
+            {
+                MessageBox.Show(string.Join("\n", errors), "Delete");
+            }
+        }
+
+        #endregion
+
+
     }
 }

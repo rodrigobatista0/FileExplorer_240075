@@ -114,10 +114,11 @@
             this.txtSearch.ForeColor = System.Drawing.Color.Gray;
             this.txtSearch.Location = new System.Drawing.Point(637, 5);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(151, 23);
+            this.txtSearch.Size = new System.Drawing.Size(151, 27);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.Text = "Search This PC";
             this.txtSearch.Enter += new System.EventHandler(this.txtSearch_Enter);
+            this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             this.txtSearch.Leave += new System.EventHandler(this.txtSearch_Leave);
             // 
             // txtDirectory
@@ -128,7 +129,7 @@
             this.txtDirectory.Font = new System.Drawing.Font("Segoe UI Emoji", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtDirectory.Location = new System.Drawing.Point(221, 6);
             this.txtDirectory.Name = "txtDirectory";
-            this.txtDirectory.Size = new System.Drawing.Size(410, 23);
+            this.txtDirectory.Size = new System.Drawing.Size(410, 27);
             this.txtDirectory.TabIndex = 1;
             this.txtDirectory.Text = "💻  This PC  >";
             this.txtDirectory.Enter += new System.EventHandler(this.txtDirectory_Enter);
@@ -333,6 +334,7 @@
             this.btnTrash.TabIndex = 8;
             this.btnTrash.Text = "🗑️";
             this.btnTrash.UseVisualStyleBackColor = true;
+            this.btnTrash.Click += new System.EventHandler(this.btnTrash_Click);
             // 
             // btnShare
             // 
@@ -357,6 +359,7 @@
             this.btnRename.TabIndex = 6;
             this.btnRename.Text = "🏷️";
             this.btnRename.UseVisualStyleBackColor = true;
+            this.btnRename.Click += new System.EventHandler(this.btnRename_Click);
             // 
             // btnCopy
             // 
@@ -369,6 +372,7 @@
             this.btnCopy.TabIndex = 5;
             this.btnCopy.Text = "📋";
             this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
             // btnCut
             // 
@@ -405,24 +409,24 @@
             this.dateToolStripMenuItem,
             this.sizeToolStripMenuItem});
             this.menuSort.Name = "menuSort";
-            this.menuSort.Size = new System.Drawing.Size(150, 70);
+            this.menuSort.Size = new System.Drawing.Size(176, 76);
             // 
             // nameToolStripMenuItem
             // 
             this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-            this.nameToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.nameToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.nameToolStripMenuItem.Text = "Name";
             // 
             // dateToolStripMenuItem
             // 
             this.dateToolStripMenuItem.Name = "dateToolStripMenuItem";
-            this.dateToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.dateToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.dateToolStripMenuItem.Text = "Date Modified";
             // 
             // sizeToolStripMenuItem
             // 
             this.sizeToolStripMenuItem.Name = "sizeToolStripMenuItem";
-            this.sizeToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.sizeToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.sizeToolStripMenuItem.Text = "Size";
             // 
             // menuView
@@ -438,36 +442,36 @@
             this.tilesToolStripMenuItem,
             this.contentToolStripMenuItem});
             this.menuView.Name = "menuView";
-            this.menuView.Size = new System.Drawing.Size(160, 180);
+            this.menuView.Size = new System.Drawing.Size(188, 212);
             // 
             // extraLargeIconsToolStripMenuItem
             // 
             this.extraLargeIconsToolStripMenuItem.Name = "extraLargeIconsToolStripMenuItem";
-            this.extraLargeIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.extraLargeIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.extraLargeIconsToolStripMenuItem.Text = "Extra large icons";
             // 
             // largeIconsToolStripMenuItem
             // 
             this.largeIconsToolStripMenuItem.Name = "largeIconsToolStripMenuItem";
-            this.largeIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.largeIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.largeIconsToolStripMenuItem.Text = "Large icons";
             // 
             // mediumIconsToolStripMenuItem
             // 
             this.mediumIconsToolStripMenuItem.Name = "mediumIconsToolStripMenuItem";
-            this.mediumIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.mediumIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.mediumIconsToolStripMenuItem.Text = "Medium icons";
             // 
             // smallIconsToolStripMenuItem
             // 
             this.smallIconsToolStripMenuItem.Name = "smallIconsToolStripMenuItem";
-            this.smallIconsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.smallIconsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.smallIconsToolStripMenuItem.Text = "Small icons";
             // 
             // listToolStripMenuItem
             // 
             this.listToolStripMenuItem.Name = "listToolStripMenuItem";
-            this.listToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.listToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.listToolStripMenuItem.Text = "List";
             // 
             // detailsToolStripMenuItem
@@ -475,19 +479,19 @@
             this.detailsToolStripMenuItem.Checked = true;
             this.detailsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.detailsToolStripMenuItem.Text = "Details";
             // 
             // tilesToolStripMenuItem
             // 
             this.tilesToolStripMenuItem.Name = "tilesToolStripMenuItem";
-            this.tilesToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.tilesToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.tilesToolStripMenuItem.Text = "Tiles";
             // 
             // contentToolStripMenuItem
             // 
             this.contentToolStripMenuItem.Name = "contentToolStripMenuItem";
-            this.contentToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.contentToolStripMenuItem.Size = new System.Drawing.Size(187, 26);
             this.contentToolStripMenuItem.Text = "Content";
             // 
             // menuNew
@@ -497,18 +501,18 @@
             this.stripFolder,
             this.stripTXT});
             this.menuNew.Name = "menuNew";
-            this.menuNew.Size = new System.Drawing.Size(155, 48);
+            this.menuNew.Size = new System.Drawing.Size(179, 52);
             // 
             // stripFolder
             // 
             this.stripFolder.Name = "stripFolder";
-            this.stripFolder.Size = new System.Drawing.Size(154, 22);
+            this.stripFolder.Size = new System.Drawing.Size(178, 24);
             this.stripFolder.Text = "Folder";
             // 
             // stripTXT
             // 
             this.stripTXT.Name = "stripTXT";
-            this.stripTXT.Size = new System.Drawing.Size(154, 22);
+            this.stripTXT.Size = new System.Drawing.Size(178, 24);
             this.stripTXT.Text = "Text Document";
             // 
             // lsvExplorer
@@ -517,18 +521,21 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsvExplorer.HideSelection = false;
+            this.lsvExplorer.LabelEdit = true;
             this.lsvExplorer.Location = new System.Drawing.Point(253, 106);
             this.lsvExplorer.Name = "lsvExplorer";
             this.lsvExplorer.Size = new System.Drawing.Size(543, 454);
             this.lsvExplorer.TabIndex = 10;
             this.lsvExplorer.UseCompatibleStateImageBehavior = false;
             this.lsvExplorer.View = System.Windows.Forms.View.Details;
+            this.lsvExplorer.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.lsvExplorer_AfterLabelEdit);
+            this.lsvExplorer.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.lsvExplorer_BeforeLabelEdit);
             this.lsvExplorer.DoubleClick += new System.EventHandler(this.lsvExplorer_DoubleClick);
             this.lsvExplorer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lsvExplorer_KeyDown);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(800, 562);
